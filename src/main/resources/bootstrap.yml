@@ -5,31 +5,41 @@ spring:
     name: gateway-server
   cloud:
     gateway:
+    #Buscará automáticamente los servicios registrados en el servidor de registro (como Eureka)
+      discovery:
+        locator:
+          enabled: true #Permite el enrutamiento automático a los servicios descubiertos.
+          lower-case-service-id: true
       routes:
         - id: customer-management
-          #uri: lb://bank-customer
-          # lb -> Es para que spring cloud gateway enrute las solicitudes a través del balanceador de carga hacia instancias registradas del servicio.
-          uri: http://localhost:8050
+          # lb: Es para que spring cloud gateway enrute las solicitudes a través del balanceador de carga hacia instancias registradas del servicio.
+          uri: lb://bc46-customer
+          #uri: http://localhost:8050
           # http:// -> Se usa para conectarse directamente a una instancia sin pasar por el balanceador de carga
           predicates:
             - Path=/api/customers/**
 
         - id: products-master
-          uri: http://localhost:8051
+          #uri: http://localhost:8051
+          uri: lb://bc46-banking-product
           predicates:
             - Path=/api/products/**
 
         - id: banking-accounts
-          uri: http://localhost:8052
+          #uri: http://localhost:8052
+          uri: lb://bc46-account
           predicates:
             - Path=/api/accounts/**
 
         - id: banking-credits
-          uri: http://localhost:8053
+          #uri: http://localhost:8053
+          uri: lb://bc46-credit
           predicates:
             - Path=/api/credits/**
 
 eureka:
+  instance:
+    hostname: localhost
   client:
     serviceUrl:
       defaultZone: http://root:s3cr3t@localhost:8761/eureka
